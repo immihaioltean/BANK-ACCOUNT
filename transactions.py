@@ -26,7 +26,7 @@ def valid_date(date_trans:list):
 
 def add_new_transaction():
     """
-    Reading the transaction
+    Add a new transaction to the list
     date (list) - [day,month,year]
     sum (float)
     type (str) - "deposit" or "withdrawal"
@@ -69,11 +69,7 @@ def transactions_sorted_by_date(transaction_list:list):
     :param transaction_list (list)
     :return: the list of transactions sorted by date
     """
-    length=len(transaction_list)
-    for date1 in range(length):
-        for date2 in range(date1+1,length):
-            if transaction_list[date1]["date"][::-1]>transaction_list[date2]["date"][::-1]:
-                transaction_list[date1],transaction_list[date2]=transaction_list[date2],transaction_list[date1]
+    transaction_list.sort(key=lambda transaction: transaction["date"][::-1])
     return transaction_list
 
 def print_transactions(transaction_list:list):
@@ -119,6 +115,7 @@ def update_transaction(transaction_list:list,update:list):
     match choice:
         case "sum":
             new_sum=float(input("Enter the new sum: "))
+            #account_balance["balance"]+=new_sum-transaction_list[index]["sum"]
             transaction_list[index]["sum"]=new_sum
         case "type":
             new_type=input("Enter the new type: ")

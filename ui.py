@@ -163,8 +163,13 @@ def reports_menu(transaction_list:list):
                 input("Press enter to continue")
 
 def main():
+    app_state={
+        "transactions":[],
+        "undo_stack":[],
+        "balance":0.0
+    }
     transaction_list=[]
-    def_list=[]
+    undo_stack=[]
     account_balance={"balance":0.0}
     while True:
         clear_screen()
@@ -183,8 +188,8 @@ def main():
             case "1":
                 transaction=add_new_transaction()
                 if transaction:
+                    #undo_stack.append((list(transaction_list),account_balance["balance"]))
                     transaction_list.append(transaction)
-                    #def_list.append(transaction)
                     transactions_sorted_by_date(transaction_list)
                     if transaction["type"]=="deposit":
                         account_balance["balance"]+=transaction["sum"]
@@ -206,8 +211,8 @@ def main():
                 update=input("Enter the date of the transaction you would like to update (day/month/year): ")
                 update=update.strip().replace("."," ").replace("/"," ").replace(","," ").split()
                 update=[int(data) for data in update]
+                #undo_stack.append((list(transaction_list), account_balance["balance"]))
                 update_transaction(transaction_list,update)
-                #def_list.append(update_transaction)
                 input("Press enter to continue")
             case "0":
                 print("Thank you for using this program! Have a good day!")

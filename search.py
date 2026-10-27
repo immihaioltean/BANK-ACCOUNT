@@ -1,22 +1,18 @@
-def get_transaction_bigger_than_a_threshold(transaction_list:list,summ:float|int):
+def get_transaction_bigger_than_a_threshold(transaction_list:list,summ:float):
     """
     :param transaction_list (list)
     :param summ (float)
     :return: a list with all the transactions bigger than the input sum
     """
-    result=[]
-    for transaction in transaction_list:
-        if transaction["sum"]>summ:
-            result.append(transaction)
-    return result
+    return [transaction for transaction in transaction_list if transaction["sum"]>summ]
 
 def trans_before_a_given_date(transaction_list:list,given_date:list,summ:float|int):
     """
     :param transaction_list - list of transactions
     :param given_date - list of numbers with the given date (day/month/year)
     :param summ (float|int) - the threshold given by the user
-    :return: a list of transactions which transactions are made
-             before a given date with bigger sums than a given sum
+    :return: a list of transactions which are made before a
+             given date with bigger sums than a given sum
     """
     result=[]
     input_date=given_date[::-1]
@@ -32,8 +28,4 @@ def get_transaction_by_type(trans_list:list,type_trans:str):
     :param type_trans (str) - type of transaction
     :return: a list of transactions with a given type
     """
-    result=[]
-    for transaction in trans_list:
-        if transaction["type"]==type_trans:
-            result.append(transaction)
-    return result
+    return [transaction for transaction in trans_list if transaction["type"]==type_trans]

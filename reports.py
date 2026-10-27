@@ -2,13 +2,12 @@ def transactions_sum_given_type(transaction_list:list,type:str):
     """
     :param transaction_list (list)
     :param type (string)
-    :return: sum of all transactions of a given type as a float/an integer
+    :return: sum of all transactions of a given type as a float
     """
     summ=0.0
     for transaction in transaction_list:
         if transaction["type"]==type:
             summ+=transaction["sum"]
-    if summ==int(summ): summ=int(summ)
     return summ
 
 def transactions_type_ascending_order_by_sum(transaction_list:list,given_type:str):
