@@ -20,5 +20,17 @@ def transactions_type_ascending_order_by_sum(transaction_list:list,given_type:st
     new_list.sort(key=lambda transaction: transaction["sum"])
     return new_list
 
-def account_balance_at_given_date():
-    pass
+def account_balance_at_given_date(transaction_list:list,given_date:list):
+    """
+    :param transaction_list: list of transactions
+    :param given_date: list [day,month,year]
+    :return: account balance at a given date
+    """
+    summ=0.0
+    for transaction in transaction_list:
+        if transaction["date"][::-1]<=given_date[::-1]:
+            if transaction["type"]=="deposit":
+                summ+=transaction["sum"]
+            else:
+                summ-=transaction["sum"]
+    return summ

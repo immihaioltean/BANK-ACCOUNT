@@ -8,7 +8,8 @@ from search import (get_transaction_bigger_than_a_threshold,
     get_transaction_by_type
 )
 from reports import (transactions_sum_given_type,
-    transactions_type_ascending_order_by_sum
+    transactions_type_ascending_order_by_sum,
+    account_balance_at_given_date
 )
 from delete import (delete_transactions_for_specified_date,
     delete_transactions_for_given_period,
@@ -181,6 +182,17 @@ def test_transactions_type_ascending_order_by_sum():
     for start,type,result in table_test:
         assert transactions_type_ascending_order_by_sum(start,type)==result
 
+def test_account_balance_at_given_date():
+    table_test=[
+        ([{"date":[12,11,2008],"sum":500,"type":"withdrawal"},
+          {"date":[21,10,2011],"sum":100,"type":"deposit"},
+          {"date":[31,12,2020],"sum":1000,"type":"deposit"}],[15,3,2015],-400),
+        ([{"date":[31,12,2020],"sum":1000,"type":"deposit"}],[14,3,2010],0),
+        ([{"date":[31,12,2020],"sum":1000,"type":"deposit"}],[16,6,2025],1000)
+    ]
+    for start,given_date,result in table_test:
+        assert account_balance_at_given_date(start,given_date)==result
+
 def run_all_tests():
     #1
     test_valid_date()
@@ -199,6 +211,7 @@ def run_all_tests():
 
     #4(reports)
     test_transactions_sum_given_type()
+    test_account_balance_at_given_date()
     test_transactions_type_ascending_order_by_sum()
 
     #5

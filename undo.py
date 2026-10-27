@@ -1,5 +1,2 @@
-def save_undo_stack():
-    pass
-
-def undo():
-    pass
+def undo(stack:list):
+    return stack.pop()

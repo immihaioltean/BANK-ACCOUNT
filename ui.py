@@ -1,4 +1,5 @@
 import os
+from typing import TypedDict
 from transactions import (
     valid_date,
     create_date_list,
@@ -16,6 +17,7 @@ from search import (
 
 from reports import (
     transactions_sum_given_type,
+    account_balance_at_given_date,
     transactions_type_ascending_order_by_sum
 )
 
@@ -32,7 +34,12 @@ def clear_screen():
     else:
         os.system("clear")
 
-def delete_menu(transaction_list:list):
+class AppState(TypedDict):
+    transactions: list
+    undo_stack: list
+    balance: float
+
+def delete_menu(app_state:AppState):
     while True:
         clear_screen()
         print("""
@@ -50,7 +57,8 @@ def delete_menu(transaction_list:list):
                 if not valid_date(given_date):
                     print("Invalid date! You have to enter a valid date!")
                 else:
-                    delete_transactions_for_specified_date(transaction_list,given_date)
+                    app_state["undo_stack"].append(list(app_state["transactions"]))
+                    delete_transactions_for_specified_date(app_state["transactions"],given_date)
                 input("Press enter to continue")
             case "2":
                 date1 = input("Enter a date: ")
@@ -60,14 +68,16 @@ def delete_menu(transaction_list:list):
                 if not (valid_date(date1) and valid_date(date2)):
                     print("Invalid date! You have to enter a valid time period!")
                 else:
-                    delete_transactions_for_given_period(transaction_list,date1,date2)
+                    app_state["undo_stack"].append(list(app_state["transactions"]))
+                    delete_transactions_for_given_period(app_state["transactions"],date1,date2)
                 input("Press enter to continue")
             case "3":
                 given_type=input("Enter the type of transactions(deposit/withdrawal): ")
                 if given_type!="deposit" and given_type!="withdrawal":
                     print("Invalid input!")
                 else:
-                    delete_transactions_of_given_type(transaction_list,given_type)
+                    app_state["undo_stack"].append(list(app_state["transactions"]))
+                    delete_transactions_of_given_type(app_state["transactions"],given_type)
                 input("Press enter to continue")
             case "4":
                 given_type = input("Enter the type of transactions(deposit/withdrawal): ")
@@ -78,7 +88,8 @@ def delete_menu(transaction_list:list):
                     if given_sum<=0:
                         print("Invalid input! The sum has to be a positive number")
                     else:
-                        delete_transactions_with_lower_sums_by_given_type(transaction_list,given_sum,given_type)
+                        app_state["undo_stack"].append(list(app_state["transactions"]))
+                        delete_transactions_with_lower_sums_by_given_type(app_state["transactions"],given_sum,given_type)
                 input("Press enter to continue")
             case "0":
                 break
@@ -86,7 +97,7 @@ def delete_menu(transaction_list:list):
                 print("Invalid choice!")
                 input("Press enter to continue")
 
-def search_menu(transaction_list:list):
+def search_menu(app_state:AppState):
     while True:
         clear_screen()
         print("""
@@ -99,7 +110,7 @@ def search_menu(transaction_list:list):
         match choice:
             case "1":
                 summ=float(input("Enter a sum: "))
-                print(get_transaction_bigger_than_a_threshold(transaction_list,summ))
+                print(get_transaction_bigger_than_a_threshold(app_state["transactions"],summ))
                 input("Press enter to continue")
             case "2":
                 given_date=input("Enter a date: ")
@@ -111,14 +122,14 @@ def search_menu(transaction_list:list):
                     if given_sum<=0:
                         print("Invalid input! You have to enter a valid sum!")
                     else:
-                        print(trans_before_a_given_date(transaction_list,given_date,given_sum))
+                        print(trans_before_a_given_date(app_state["transactions"],given_date,given_sum))
                 input("Press enter to continue")
             case "3":
                 type = input("Enter the type of transaction: ")
                 if type != "deposit" and type != "withdrawal":
                     print("Invalid input. Yoy have to enter a valid type (deposit/withdrawal)")
                 else:
-                    print(get_transaction_by_type(transaction_list, type))
+                    print(get_transaction_by_type(app_state["transactions"], type))
                 input("Press enter to continue")
             case "0":
                 break
@@ -126,7 +137,7 @@ def search_menu(transaction_list:list):
                 print("Invalid choice!")
                 input("Press enter to continue")
 
-def reports_menu(transaction_list:list):
+def reports_menu(app_state:AppState):
     while True:
         clear_screen()
         print("""
@@ -142,16 +153,22 @@ def reports_menu(transaction_list:list):
                 if type != "deposit" and type != "withdrawal":
                     print("Invalid input. Yoy have to enter a valid type (deposit/withdrawal)")
                 else:
-                    print(transactions_sum_given_type(transaction_list,type))
+                    print(transactions_sum_given_type(app_state["transactions"],type))
                 input("Press enter to continue")
             case "2":
-                pass
+                given_date = input("Enter a date: ")
+                given_date = create_date_list(given_date)
+                if not valid_date(given_date):
+                    print("Invalid date! You have to enter a valid date!")
+                else:
+                    print(account_balance_at_given_date(app_state["transactions"],given_date))
+                input("Press enter to continue")
             case "3":
                 given_type=input("Enter the type of transactions (deposit/withdrawal): ")
                 if given_type != "deposit" and given_type != "withdrawal":
                     print("You have to enter a valid type!")
                 else:
-                    print(transactions_type_ascending_order_by_sum(transaction_list,given_type))
+                    print(transactions_type_ascending_order_by_sum(app_state["transactions"],given_type))
                 input("Press enter to continue")
             case "0":
                 break
@@ -160,14 +177,11 @@ def reports_menu(transaction_list:list):
                 input("Press enter to continue")
 
 def main():
-    app_state={
+    app_state: AppState={
         "transactions":[],
         "undo_stack":[],
         "balance":0.0
     }
-    transaction_list=[]
-    undo_stack=[]
-    account_balance={"balance":0.0}
     while True:
         clear_screen()
         print("""
@@ -185,30 +199,30 @@ def main():
             case "1":
                 transaction=add_new_transaction()
                 if transaction:
-                    #undo_stack.append((list(transaction_list),account_balance["balance"]))
-                    transaction_list.append(transaction)
-                    transactions_sorted_by_date(transaction_list)
+                    app_state["undo_stack"].append(list(app_state["transactions"]))
+                    app_state["transactions"].append(transaction)
+                    transactions_sorted_by_date(app_state["transactions"])
                     if transaction["type"]=="deposit":
-                        account_balance["balance"]+=transaction["sum"]
+                        app_state["balance"]+=transaction["sum"]
                     else:
-                        account_balance["balance"]-=transaction["sum"]
+                        app_state["balance"]-=transaction["sum"]
                 input("Press enter to continue")
             case "2":
-                delete_menu(transaction_list)
+                delete_menu(app_state)
             case "3":
-                search_menu(transaction_list)
+                search_menu(app_state)
             case "4":
-                reports_menu(transaction_list)
+                reports_menu(app_state)
             case "5":
                 pass
             case "6":
-                print_transactions(transaction_list)
+                print_transactions(app_state["transactions"])
                 input("Press enter to continue")
             case "7":
                 update = input("Enter the date of the transaction you would like to update (day/month/year): ")
                 update = create_date_list(update)
-                #undo_stack.append((list(transaction_list), account_balance["balance"]))
-                update_transaction(transaction_list,update)
+                #app_state["undo_stack"].append((list(app_state["transactions"]),app_state["balance"]))
+                update_transaction(app_state["transactions"],update)
                 input("Press enter to continue")
             case "0":
                 print("Thank you for using this program! Have a good day!")
