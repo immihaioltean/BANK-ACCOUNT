@@ -1,6 +1,7 @@
 import os
 from transactions import (
     valid_date,
+    create_date_list,
     add_new_transaction,
     update_transaction,
     transactions_sorted_by_date,
@@ -45,8 +46,7 @@ def delete_menu(transaction_list:list):
         match choice:
             case "1":
                 given_date = input("Enter a date: ")
-                given_date = given_date.strip().replace(".", " ").replace("/", " ").replace(",", " ").split()
-                given_date = [int(data) for data in given_date]
+                given_date = create_date_list(given_date)
                 if not valid_date(given_date):
                     print("Invalid date! You have to enter a valid date!")
                 else:
@@ -54,11 +54,9 @@ def delete_menu(transaction_list:list):
                 input("Press enter to continue")
             case "2":
                 date1 = input("Enter a date: ")
-                date1 = date1.strip().replace(".", " ").replace("/", " ").replace(",", " ").split()
-                date1 = [int(data) for data in date1]
+                date1 = create_date_list(date1)
                 date2 = input("Enter a date: ")
-                date2 = date2.strip().replace(".", " ").replace("/", " ").replace(",", " ").split()
-                date2 = [int(data) for data in date2]
+                date2 = create_date_list(date2)
                 if not (valid_date(date1) and valid_date(date2)):
                     print("Invalid date! You have to enter a valid time period!")
                 else:
@@ -105,8 +103,7 @@ def search_menu(transaction_list:list):
                 input("Press enter to continue")
             case "2":
                 given_date=input("Enter a date: ")
-                given_date=given_date.strip().replace("."," ").replace("/"," ").replace(","," ").split()
-                given_date=[int(data) for data in given_date]
+                given_date= create_date_list(given_date)
                 if not valid_date(given_date):
                     print("Invalid date! You have to enter a valid date!")
                 else:
@@ -208,9 +205,8 @@ def main():
                 print_transactions(transaction_list)
                 input("Press enter to continue")
             case "7":
-                update=input("Enter the date of the transaction you would like to update (day/month/year): ")
-                update=update.strip().replace("."," ").replace("/"," ").replace(","," ").split()
-                update=[int(data) for data in update]
+                update = input("Enter the date of the transaction you would like to update (day/month/year): ")
+                update = create_date_list(update)
                 #undo_stack.append((list(transaction_list), account_balance["balance"]))
                 update_transaction(transaction_list,update)
                 input("Press enter to continue")

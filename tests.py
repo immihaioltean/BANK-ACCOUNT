@@ -1,6 +1,7 @@
 from transactions import (valid_date,
     update_transaction,
-    transactions_sorted_by_date
+    transactions_sorted_by_date,
+    create_date_list
 )
 from search import (get_transaction_bigger_than_a_threshold,
     trans_before_a_given_date,
@@ -22,6 +23,15 @@ def test_valid_date():
     ]
     for date_trans,result in table_test:
         assert valid_date(date_trans)==result
+
+def test_create_date_list():
+    table_test=[
+        ("23.10.2024",[23,10,2024]),
+        ("23,05/2005",[23,5,2005]),
+        ("   14.12,2000   ",[14,12,2000])
+    ]
+    for string,date_list in table_test:
+        assert create_date_list(string)==date_list
 
 # def test_update_transaction():
 #     table_test=[
@@ -174,6 +184,7 @@ def test_transactions_type_ascending_order_by_sum():
 def run_all_tests():
     #1
     test_valid_date()
+    test_create_date_list()
     test_transactions_sorted_by_date()
     #test_update_transaction() mai am de lucru aici
 

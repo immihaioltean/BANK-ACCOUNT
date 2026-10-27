@@ -24,6 +24,14 @@ def valid_date(date_trans:list):
             return False
     return True
 
+def create_date_list(data:str):
+    """
+    :param data: string
+    :return: a list with the given date [day,month,year]
+    """
+    data = data.strip().replace(".", " ").replace("/", " ").replace(",", " ").split()
+    return [int(i) for i in data]
+
 def add_new_transaction():
     """
     Add a new transaction to the list
