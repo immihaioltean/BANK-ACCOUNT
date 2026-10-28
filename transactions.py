@@ -1,4 +1,5 @@
 from datetime import date
+from typing import TypedDict
 
 def valid_date(date_trans:list):
     """
@@ -93,47 +94,63 @@ def print_transactions(transaction_list:list):
         print(f"and it was a {transaction["type"]} of {transaction["sum"]}")
         index+=1
 
-def update_transaction(transaction_list:list,update:list):
-    index=-1
-    length=len(transaction_list)
-    pos=0
+def read_update_transaction(transaction_list:list):
+    update = input("Enter the date of the transaction you would like to update (day/month/year): ")
+    update = create_date_list(update)
+    index = -1
+    length = len(transaction_list)
+    pos = 0
     for transaction in range(length):
-        if transaction_list[transaction]["date"]==update:
-            index+=1
-            pos=transaction
-    if index<0:
+        if transaction_list[transaction]["date"] == update:
+            index += 1
+            pos = transaction
+    if index < 0:
         print("No transaction found!")
         return None
-    choice=0
-    if index>0:
+    choice = 0
+    if index > 0:
         print("Which transaction would you like to update?")
-        for transaction in range(pos-index,pos+1):
+        for transaction in range(pos - index, pos + 1):
             print(f"{transaction}. Transaction took place on: ", end="")
             for data in transaction_list[transaction]["date"]:
                 print(data, end=" ")
             print(f"and it was a {transaction_list[transaction]["type"]}"
                   f" of {transaction_list[transaction]["sum"]}")
-        choice=int(input("Enter your choice: "))
-        if not pos-index<=choice<=pos:
+        choice = int(input("Enter your choice: "))
+        if not pos - index <= choice <= pos:
             print("Invalid choice!")
             return None
-    if index>0: index=choice
+    if index > 0: index = choice
     print("What you would like to update? Enter sum for sum, type for type or both")
-    choice=input("Enter your choice: ")
+    choice = input("Enter your choice: ")
+    new={}
     match choice:
         case "sum":
-            new_sum=float(input("Enter the new sum: "))
-            #account_balance["balance"]+=new_sum-transaction_list[index]["sum"]
-            transaction_list[index]["sum"]=new_sum
+            new["sum"]=float(input("Enter the new sum: "))
         case "type":
-            new_type=input("Enter the new type: ")
-            transaction_list[index]["type"]=new_type
+            new["type"]=input("Enter the new type: ")
         case "both":
-            new_sum = float(input("Enter the new sum: "))
-            transaction_list[index]["sum"] = new_sum
-            new_type = input("Enter the new type: ")
-            transaction_list[index]["type"] = new_type
+            new["sum"] = float(input("Enter the new sum: "))
+            new["type"] = input("Enter the new type: ")
         case _:
             print("Invalid choice!")
-    print("Transaction updated successfully!")
+    new["index"]=index
+    new["choice"]=choice
+    return new
+
+class Update(TypedDict):
+    index: int
+    choice: str
+    sum: float
+    type: str
+
+def update_transaction(transaction_list:list,new:Update):
+    match new["choice"]:
+        case "sum":
+            transaction_list[new["index"]]["sum"] = new["sum"]
+        case "type":
+            transaction_list[new["index"]]["type"] = new["type"]
+        case "both":
+            transaction_list[new["index"]]["sum"] = new["sum"]
+            transaction_list[new["index"]]["type"] = new["type"]
     return transaction_list

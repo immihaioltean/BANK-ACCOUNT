@@ -4,6 +4,7 @@ from transactions import (
     valid_date,
     create_date_list,
     add_new_transaction,
+    read_update_transaction,
     update_transaction,
     transactions_sorted_by_date,
     print_transactions
@@ -214,15 +215,25 @@ def main():
             case "4":
                 reports_menu(app_state)
             case "5":
-                pass
+                app_state["transactions"]=app_state["undo_stack"].pop()
+                print("Undo done successfully!")
+                input("Press enter to continue")
             case "6":
                 print_transactions(app_state["transactions"])
                 input("Press enter to continue")
             case "7":
-                update = input("Enter the date of the transaction you would like to update (day/month/year): ")
-                update = create_date_list(update)
-                #app_state["undo_stack"].append((list(app_state["transactions"]),app_state["balance"]))
-                update_transaction(app_state["transactions"],update)
+                up_date=read_update_transaction(app_state["transactions"])
+                if up_date:
+                    old_transactions = []
+                    for transactions in app_state["transactions"]:
+                        old_transactions.append({
+                            "date": list(transactions["date"]),
+                            "sum": transactions["sum"],
+                            "type": transactions["type"]
+                        })
+                    app_state["undo_stack"].append(old_transactions)
+                    update_transaction(app_state["transactions"],up_date)
+                    print("Transaction updated successfully!")
                 input("Press enter to continue")
             case "0":
                 print("Thank you for using this program! Have a good day!")

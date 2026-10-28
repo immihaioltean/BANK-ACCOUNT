@@ -1,5 +1,4 @@
 from transactions import (valid_date,
-    update_transaction,
     transactions_sorted_by_date,
     create_date_list
 )
@@ -33,18 +32,6 @@ def test_create_date_list():
     ]
     for string,date_list in table_test:
         assert create_date_list(string)==date_list
-
-# def test_update_transaction():
-#     table_test=[
-#         ([{"date":[28,3,2010],"sum":50,"type":"deposit"}],
-#          [{"date":[28,3,2010],"sum":100,"type":"deposit"}],
-#          [{"date":[28,3,2010],"sum":100,"type":"deposit"}]),
-#         ([{"date":[15,4,2014],"sum":500,"type":"deposit"}],
-#          [{"date":[15,4,2014],"sum":350.4,"type":"withdrawal"}],
-#          [{"date":[15,4,2014],"sum":350.4,"type":"withdrawal"}])
-#     ]
-#     for current,new,result in table_test:
-#         assert update_transaction(current,new)==result
 
 def test_get_transaction_bigger_than_a_threshold():
     table_test=[
@@ -194,25 +181,16 @@ def test_account_balance_at_given_date():
         assert account_balance_at_given_date(start,given_date)==result
 
 def run_all_tests():
-    #1
     test_valid_date()
     test_create_date_list()
     test_transactions_sorted_by_date()
-    #test_update_transaction() mai am de lucru aici
-
-    #2
     test_delete_transactions_for_specified_date()
     test_delete_transactions_for_given_period()
     test_delete_transactions_of_given_type()
-    #3(search)
     test_get_transaction_bigger_than_a_threshold()
     test_trans_before_a_given_date()
     test_get_transaction_by_type()
-
-    #4(reports)
     test_transactions_sum_given_type()
     test_account_balance_at_given_date()
     test_transactions_type_ascending_order_by_sum()
-
-    #5
     test_delete_transactions_with_lower_sums_by_given_type()
