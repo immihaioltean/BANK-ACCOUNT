@@ -15,6 +15,7 @@ from delete import (delete_transactions_for_specified_date,
     delete_transactions_of_given_type,
     delete_transactions_with_lower_sums_by_given_type
 )
+from undo import perform_undo
 def test_valid_date():
     table_test=[
         ([28,3,2017],True),
@@ -180,6 +181,23 @@ def test_account_balance_at_given_date():
     for start,given_date,result in table_test:
         assert account_balance_at_given_date(start,given_date)==result
 
+def test_perform_undo():
+    table_test=[
+        ([[{"date":[12,11,2008],"sum":500,"type":"withdrawal"},
+          {"date":[21,10,2011],"sum":100,"type":"deposit"},
+          {"date":[31,12,2020],"sum":1000,"type":"deposit"}],
+          [{"date": [12, 11, 2008], "sum": 500, "type": "withdrawal"},
+           {"date": [21, 10, 2011], "sum": 100, "type": "deposit"}]],
+        [{"date": [12, 11, 2008], "sum": 500, "type": "withdrawal"},
+           {"date": [21, 10, 2011], "sum": 100, "type": "deposit"},
+          {"date": [21, 10, 2011], "sum": 500, "type": "deposit"}],
+         [{"date": [12, 11, 2008], "sum": 500, "type": "withdrawal"},
+          {"date": [21, 10, 2011], "sum": 100, "type": "deposit"}]),
+        ([[]],[],[])
+    ]
+    for states,transactions,result in table_test:
+        assert perform_undo(states,transactions)==result
+
 def run_all_tests():
     test_valid_date()
     test_create_date_list()
@@ -194,3 +212,4 @@ def run_all_tests():
     test_account_balance_at_given_date()
     test_transactions_type_ascending_order_by_sum()
     test_delete_transactions_with_lower_sums_by_given_type()
+    test_perform_undo()

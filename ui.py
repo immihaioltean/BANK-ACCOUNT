@@ -29,6 +29,11 @@ from delete import (
     delete_transactions_with_lower_sums_by_given_type
 )
 
+from undo import (
+    save_state,
+    perform_undo
+)
+
 def clear_screen():
     if os.name=="nt":
         os.system("cls")
@@ -58,7 +63,8 @@ def delete_menu(app_state:AppState):
                 if not valid_date(given_date):
                     print("Invalid date! You have to enter a valid date!")
                 else:
-                    app_state["undo_stack"].append(list(app_state["transactions"]))
+                    save_state(app_state["undo_stack"],app_state["transactions"])
+                    #app_state["undo_stack"].append(list(app_state["transactions"]))
                     delete_transactions_for_specified_date(app_state["transactions"],given_date)
                 input("Press enter to continue")
             case "2":
@@ -69,7 +75,8 @@ def delete_menu(app_state:AppState):
                 if not (valid_date(date1) and valid_date(date2)):
                     print("Invalid date! You have to enter a valid time period!")
                 else:
-                    app_state["undo_stack"].append(list(app_state["transactions"]))
+                    save_state(app_state["undo_stack"], app_state["transactions"])
+                    #app_state["undo_stack"].append(list(app_state["transactions"]))
                     delete_transactions_for_given_period(app_state["transactions"],date1,date2)
                 input("Press enter to continue")
             case "3":
@@ -77,7 +84,8 @@ def delete_menu(app_state:AppState):
                 if given_type!="deposit" and given_type!="withdrawal":
                     print("Invalid input!")
                 else:
-                    app_state["undo_stack"].append(list(app_state["transactions"]))
+                    save_state(app_state["undo_stack"], app_state["transactions"])
+                    #app_state["undo_stack"].append(list(app_state["transactions"]))
                     delete_transactions_of_given_type(app_state["transactions"],given_type)
                 input("Press enter to continue")
             case "4":
@@ -89,7 +97,8 @@ def delete_menu(app_state:AppState):
                     if given_sum<=0:
                         print("Invalid input! The sum has to be a positive number")
                     else:
-                        app_state["undo_stack"].append(list(app_state["transactions"]))
+                        save_state(app_state["undo_stack"], app_state["transactions"])
+                        #app_state["undo_stack"].append(list(app_state["transactions"]))
                         delete_transactions_with_lower_sums_by_given_type(app_state["transactions"],given_sum,given_type)
                 input("Press enter to continue")
             case "0":
@@ -200,7 +209,8 @@ def main():
             case "1":
                 transaction=add_new_transaction()
                 if transaction:
-                    app_state["undo_stack"].append(list(app_state["transactions"]))
+                    save_state(app_state["undo_stack"], app_state["transactions"])
+                    #app_state["undo_stack"].append(list(app_state["transactions"]))
                     app_state["transactions"].append(transaction)
                     transactions_sorted_by_date(app_state["transactions"])
                     if transaction["type"]=="deposit":
@@ -215,8 +225,12 @@ def main():
             case "4":
                 reports_menu(app_state)
             case "5":
-                app_state["transactions"]=app_state["undo_stack"].pop()
-                print("Undo done successfully!")
+                if not app_state["undo_stack"]:
+                    print("Nothing to undo!")
+                else:
+                    perform_undo(app_state["undo_stack"],app_state["transactions"])
+                    #app_state["transactions"]=app_state["undo_stack"].pop()
+                    print("Undo done successfully!")
                 input("Press enter to continue")
             case "6":
                 print_transactions(app_state["transactions"])
