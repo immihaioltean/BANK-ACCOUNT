@@ -64,7 +64,6 @@ def delete_menu(app_state:AppState):
                     print("Invalid date! You have to enter a valid date!")
                 else:
                     save_state(app_state["undo_stack"],app_state["transactions"])
-                    #app_state["undo_stack"].append(list(app_state["transactions"]))
                     delete_transactions_for_specified_date(app_state["transactions"],given_date)
                 input("Press enter to continue")
             case "2":
@@ -76,7 +75,6 @@ def delete_menu(app_state:AppState):
                     print("Invalid date! You have to enter a valid time period!")
                 else:
                     save_state(app_state["undo_stack"], app_state["transactions"])
-                    #app_state["undo_stack"].append(list(app_state["transactions"]))
                     delete_transactions_for_given_period(app_state["transactions"],date1,date2)
                 input("Press enter to continue")
             case "3":
@@ -85,7 +83,6 @@ def delete_menu(app_state:AppState):
                     print("Invalid input!")
                 else:
                     save_state(app_state["undo_stack"], app_state["transactions"])
-                    #app_state["undo_stack"].append(list(app_state["transactions"]))
                     delete_transactions_of_given_type(app_state["transactions"],given_type)
                 input("Press enter to continue")
             case "4":
@@ -98,7 +95,6 @@ def delete_menu(app_state:AppState):
                         print("Invalid input! The sum has to be a positive number")
                     else:
                         save_state(app_state["undo_stack"], app_state["transactions"])
-                        #app_state["undo_stack"].append(list(app_state["transactions"]))
                         delete_transactions_with_lower_sums_by_given_type(app_state["transactions"],given_sum,given_type)
                 input("Press enter to continue")
             case "0":
@@ -210,7 +206,6 @@ def main():
                 transaction=add_new_transaction()
                 if transaction:
                     save_state(app_state["undo_stack"], app_state["transactions"])
-                    #app_state["undo_stack"].append(list(app_state["transactions"]))
                     app_state["transactions"].append(transaction)
                     transactions_sorted_by_date(app_state["transactions"])
                     if transaction["type"]=="deposit":
@@ -225,11 +220,9 @@ def main():
             case "4":
                 reports_menu(app_state)
             case "5":
-                if not app_state["undo_stack"]:
+                if not perform_undo(app_state["undo_stack"], app_state["transactions"]):
                     print("Nothing to undo!")
                 else:
-                    perform_undo(app_state["undo_stack"],app_state["transactions"])
-                    #app_state["transactions"]=app_state["undo_stack"].pop()
                     print("Undo done successfully!")
                 input("Press enter to continue")
             case "6":
