@@ -1,6 +1,15 @@
 from datetime import date
 from typing import TypedDict
 
+from domain import (
+    get_date,
+    get_sum,
+    get_type,
+    set_date,
+    set_sum,
+    set_type
+)
+
 def valid_date(date_trans:list):
     """
     Check if the date is valid for the transaction (considering it took place after 1900)
@@ -33,7 +42,7 @@ def create_date_list(data:str):
     data = data.strip().replace(".", " ").replace("/", " ").replace(",", " ").split()
     return [int(i) for i in data]
 
-def add_new_transaction():
+def create_new_transaction():
     """
     Add a new transaction to the list
     date (list) - [day,month,year]
@@ -42,9 +51,8 @@ def add_new_transaction():
     :return: return None if the transaction is invalid or
              a dictionary with the transaction details (date,sum,type)
     """
-    date_trans=input("Enter the date of the transaction (day/month/year): ")
-    date_trans=date_trans.strip().replace("."," ").replace("/"," ").replace(","," ").split()
-    date_trans=[int(str_date) for str_date in date_trans]
+    date_trans = input("Enter the date of the transaction (day/month/year): ")
+    date_trans = create_date_list(date_trans)
 
     if valid_date(date_trans)==False:
         print("Invalid input. You have to enter a valid date!")
@@ -60,8 +68,6 @@ def add_new_transaction():
         print("Invalid input. You have to enter a valid sum!")
         return None
     else:
-        if int(sum_trans)==float(sum_trans):
-            sum_trans=int(sum_trans)
         print(f"The sum of the transaction is: {sum_trans}")
 
     type_trans=input("Enter the type of the transaction (deposit/withdrawal): ")
@@ -72,6 +78,14 @@ def add_new_transaction():
         print(f"Transaction added successfully!")
 
     return {"date":date_trans,"sum":sum_trans,"type":type_trans}
+
+def add_transaction(transaction_list:list,transaction:dict):
+    """
+    :param transaction_list: list of transactions
+    :param transaction: dict with the transaction details (date,sum,type)
+    :return: transaction_list with the new transaction added
+    """
+    return transaction_list.append(transaction)
 
 def transactions_sorted_by_date(transaction_list:list):
     """
@@ -134,6 +148,7 @@ def read_update_transaction(transaction_list:list):
             new["type"] = input("Enter the new type: ")
         case _:
             print("Invalid choice!")
+            return None
     new["index"]=index
     new["choice"]=choice
     return new
@@ -145,6 +160,14 @@ class Update(TypedDict):
     type: str
 
 def update_transaction(transaction_list:list,new:Update):
+    """
+    Update an existent transaction
+    :param transaction_list: list of transactions
+    :param new: dict with choice,type,sum,index(if there is more than
+                one transaction at a specific date, the user can choose
+                which one to update)
+    :return: the list of transactions updated
+    """
     match new["choice"]:
         case "sum":
             transaction_list[new["index"]]["sum"] = new["sum"]
@@ -154,3 +177,18 @@ def update_transaction(transaction_list:list,new:Update):
             transaction_list[new["index"]]["sum"] = new["sum"]
             transaction_list[new["index"]]["type"] = new["type"]
     return transaction_list
+
+def copy_transactions(transaction_list:list):
+    """
+    Creates an independent copy of the transactions
+    :param transaction_list: list of transactions
+    :return: the independent copy of the transactions list
+    """
+    old_transactions = []
+    for transactions in transaction_list:
+        old_transactions.append({
+            "date": list(transactions["date"]),
+            "sum": transactions["sum"],
+            "type": transactions["type"]
+        })
+    return old_transactions

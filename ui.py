@@ -3,11 +3,13 @@ from typing import TypedDict
 from transactions import (
     valid_date,
     create_date_list,
-    add_new_transaction,
+    create_new_transaction,
+    add_transaction,
     read_update_transaction,
     update_transaction,
     transactions_sorted_by_date,
-    print_transactions
+    print_transactions,
+    copy_transactions
 )
 
 from search import (
@@ -203,15 +205,16 @@ def main():
         choice=input("Enter your choice: ")
         match choice:
             case "1":
-                transaction=add_new_transaction()
+                transaction=create_new_transaction()
                 if transaction:
                     save_state(app_state["undo_stack"], app_state["transactions"])
-                    app_state["transactions"].append(transaction)
+                    add_transaction(app_state["transactions"],transaction)
                     transactions_sorted_by_date(app_state["transactions"])
-                    if transaction["type"]=="deposit":
-                        app_state["balance"]+=transaction["sum"]
-                    else:
-                        app_state["balance"]-=transaction["sum"]
+                    #TODO functionality
+                    # if transaction["type"]=="deposit":
+                    #     app_state["balance"]+=transaction["sum"]
+                    # else:
+                    #     app_state["balance"]-=transaction["sum"]
                 input("Press enter to continue")
             case "2":
                 delete_menu(app_state)
@@ -231,14 +234,7 @@ def main():
             case "7":
                 up_date=read_update_transaction(app_state["transactions"])
                 if up_date:
-                    old_transactions = []
-                    for transactions in app_state["transactions"]:
-                        old_transactions.append({
-                            "date": list(transactions["date"]),
-                            "sum": transactions["sum"],
-                            "type": transactions["type"]
-                        })
-                    app_state["undo_stack"].append(old_transactions)
+                    app_state["undo_stack"].append(copy_transactions(app_state["transactions"]))
                     update_transaction(app_state["transactions"],up_date)
                     print("Transaction updated successfully!")
                 input("Press enter to continue")
