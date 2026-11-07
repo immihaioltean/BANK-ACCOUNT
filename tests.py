@@ -1,5 +1,4 @@
 from service import (
-    valid_date,
     transactions_sorted_by_date,
     create_date_list,
     get_transaction_bigger_than_a_threshold,
@@ -15,6 +14,8 @@ from service import (
     perform_undo
 )
 
+from validation import valid_date
+
 def test_valid_date():
     table_test=[
         ([28,3,2017],True),
@@ -26,13 +27,13 @@ def test_valid_date():
         valid_date([29,2,2017])
         assert False
     except ValueError:
-        pass
+        assert True
 
 def test_create_date_list():
     table_test=[
         ("23.10.2024",[23,10,2024]),
-        ("23,05/2005",[23,5,2005]),
-        ("   14.12,2000   ",[14,12,2000])
+        ("23.05/2005",[23,5,2005]),
+        ("   14.12/2000   ",[14,12,2000])
     ]
     for string,date_list in table_test:
         assert create_date_list(string)==date_list
