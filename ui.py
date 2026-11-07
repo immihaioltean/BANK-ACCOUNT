@@ -1,40 +1,35 @@
 import os
 from typing import TypedDict
-from transactions import (
-    valid_date,
+from service import (
     create_date_list,
-    create_new_transaction,
     add_transaction,
     read_update_transaction,
     update_transaction,
     transactions_sorted_by_date,
     print_transactions,
-    copy_transactions
-)
-
-from search import (
+    copy_transactions,
     get_transaction_bigger_than_a_threshold,
     trans_before_a_given_date,
-    get_transaction_by_type
-)
-
-from reports import (
+    get_transaction_by_type,
     transactions_sum_given_type,
     account_balance_at_given_date,
-    transactions_type_ascending_order_by_sum
-)
-
-from delete import (
+    transactions_type_ascending_order_by_sum,
     delete_transactions_for_specified_date,
     delete_transactions_for_given_period,
     delete_transactions_of_given_type,
-    delete_transactions_with_lower_sums_by_given_type
-)
-
-from undo import (
+    delete_transactions_with_lower_sums_by_given_type,
     save_state,
     perform_undo
 )
+
+from validation import (
+    valid_date,
+    validate_date_input,
+    validate_sum,
+    validate_type
+)
+
+from domain import create_transaction
 
 def clear_screen():
     if os.name=="nt":
@@ -45,7 +40,42 @@ def clear_screen():
 class AppState(TypedDict):
     transactions: list
     undo_stack: list
-    balance: float
+    #balance: float
+
+def read_valid_date(message):
+    while True:
+        try:
+            given_date = input(message)
+            validate_date_input(given_date)
+            given_date=create_date_list(given_date)
+            valid_date(given_date)
+            return given_date
+        except ValueError as e:
+            print(f"Invalid value. {e}")
+
+def read_valid_sum(message):
+    while True:
+        try:
+            given_sum = float(input(message))
+            validate_sum(given_sum)
+            return given_sum
+        except ValueError as e:
+            print(f"Invalid value. {e}")
+
+def read_valid_type(message):
+    while True:
+        try:
+            given_type = input(message)
+            validate_type(given_type)
+            return given_type
+        except NameError as e:
+            print(f"Invalid type. {e}")
+
+def read_transaction():
+    date = read_valid_date("Enter the date of the transaction (day/month/year):")
+    summ = read_valid_sum("Enter the sum of the transaction:")
+    type = read_valid_type("Enter the type of transaction (deposit/withdrawal):")
+    return create_transaction(date,summ,type)
 
 def delete_menu(app_state:AppState):
     while True:
@@ -184,37 +214,34 @@ def reports_menu(app_state:AppState):
                 print("Invalid choice!")
                 input("Press enter to continue")
 
+def print_main_menu():
+    print("""
+            1. Add transaction
+            2. Delete
+            3. Search
+            4. Reports
+            5. Undo
+            6. Print transactions
+            7. Update transaction
+            0. Exit the program
+    """)
+
 def main():
     app_state: AppState={
         "transactions":[],
         "undo_stack":[],
-        "balance":0.0
+        #"balance":0.0
     }
     while True:
         clear_screen()
-        print("""
-        1. Add transaction
-        2. Delete
-        3. Search
-        4. Reports
-        5. Undo
-        6. Print transactions
-        7. Update transaction
-        0. Exit the program
-        """)
+        print_main_menu()
         choice=input("Enter your choice: ")
         match choice:
             case "1":
-                transaction=create_new_transaction()
-                if transaction:
-                    save_state(app_state["undo_stack"], app_state["transactions"])
-                    add_transaction(app_state["transactions"],transaction)
-                    transactions_sorted_by_date(app_state["transactions"])
-                    #TODO functionality
-                    # if transaction["type"]=="deposit":
-                    #     app_state["balance"]+=transaction["sum"]
-                    # else:
-                    #     app_state["balance"]-=transaction["sum"]
+                save_state(app_state["undo_stack"], app_state["transactions"])
+                transaction = read_transaction()
+                add_transaction(app_state["transactions"],transaction)
+                transactions_sorted_by_date(app_state["transactions"])
                 input("Press enter to continue")
             case "2":
                 delete_menu(app_state)
@@ -223,9 +250,10 @@ def main():
             case "4":
                 reports_menu(app_state)
             case "5":
-                if not perform_undo(app_state["undo_stack"], app_state["transactions"]):
+                if not app_state["undo_stack"]:
                     print("Nothing to undo!")
                 else:
+                    perform_undo(app_state["undo_stack"], app_state["transactions"])
                     print("Undo done successfully!")
                 input("Press enter to continue")
             case "6":

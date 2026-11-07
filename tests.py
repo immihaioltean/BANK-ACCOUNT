@@ -1,29 +1,32 @@
-from transactions import (valid_date,
+from service import (
+    valid_date,
     transactions_sorted_by_date,
-    create_date_list
-)
-from search import (get_transaction_bigger_than_a_threshold,
+    create_date_list,
+    get_transaction_bigger_than_a_threshold,
     trans_before_a_given_date,
-    get_transaction_by_type
-)
-from reports import (transactions_sum_given_type,
+    get_transaction_by_type,
+    transactions_sum_given_type,
     transactions_type_ascending_order_by_sum,
-    account_balance_at_given_date
-)
-from delete import (delete_transactions_for_specified_date,
+    account_balance_at_given_date,
+    delete_transactions_for_specified_date,
     delete_transactions_for_given_period,
     delete_transactions_of_given_type,
-    delete_transactions_with_lower_sums_by_given_type
+    delete_transactions_with_lower_sums_by_given_type,
+    perform_undo
 )
-from undo import perform_undo
+
 def test_valid_date():
     table_test=[
         ([28,3,2017],True),
-        ([29,2,2019],False),
         ([29,2,2020],True),
     ]
     for date_trans,result in table_test:
         assert valid_date(date_trans)==result
+    try:
+        valid_date([29,2,2017])
+        assert False
+    except ValueError:
+        pass
 
 def test_create_date_list():
     table_test=[

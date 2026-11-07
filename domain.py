@@ -7,8 +7,8 @@ def get_sum(transactions:dict):
 def get_type(transactions:dict):
     return transactions["type"]
 
-# def create_transaction(date,summ,type):
-#     return dict(date=date,sum=summ,type=type)
+def create_transaction(date,summ,type):
+    return dict(date=date,sum=summ,type=type)
 
 def set_date(transactions,date):
     transactions["date"] = date
